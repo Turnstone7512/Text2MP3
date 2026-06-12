@@ -12,64 +12,73 @@
         <div>
           <p class="eyebrow">Static Browser App</p>
           <h1>Text2MP3</h1>
-          <p class="subtitle">把文字轉成 MP3。資料只暫存在你的瀏覽器，不使用資料庫。</p>
+          <p class="subtitle">&#25226;&#25991;&#23383;&#36681;&#25104; MP3&#12290;&#36039;&#26009;&#21482;&#26283;&#23384;&#22312;&#20320;&#30340;&#28687;&#35261;&#22120;&#65292;&#19981;&#20351;&#29992;&#36039;&#26009;&#24235;&#12290;</p>
         </div>
         <div class="status-pill" id="statusPill" aria-live="polite">Ready</div>
       </section>
 
-      <section class="workspace" aria-label="文字轉語音工具">
+      <section class="workspace" aria-label="Text to speech tool">
         <div class="editor-panel">
-          <label for="textContent">輸入文字</label>
-          <textarea id="textContent" placeholder="請輸入要轉成語音的文字..."></textarea>
+          <label for="textContent">&#36664;&#20837;&#25991;&#23383;</label>
+          <textarea id="textContent" placeholder="&#35531;&#36664;&#20837;&#35201;&#36681;&#25104;&#35486;&#38899;&#30340;&#25991;&#23383;..."></textarea>
           <div class="meta-row">
             <span id="charCount">0 characters</span>
-            <button class="ghost-button" id="clearTextButton" type="button">清除文字</button>
+            <button class="ghost-button" id="clearTextButton" type="button">&#28165;&#38500;&#25991;&#23383;</button>
           </div>
         </div>
 
         <aside class="settings-panel">
           <div class="field">
-            <label for="voiceSelect">語音</label>
+            <label for="voiceSelect">&#35486;&#38899;</label>
             <select id="voiceSelect">
               <option value="en-US-EmmaNeural">Emma - English (US)</option>
               <option value="en-US-JennyNeural">Jenny - English (US)</option>
               <option value="en-US-GuyNeural">Guy - English (US)</option>
-              <option value="zh-TW-HsiaoChenNeural">曉臻 - 中文 (台灣)</option>
-              <option value="zh-TW-YunJheNeural">雲哲 - 中文 (台灣)</option>
+              <option value="zh-TW-HsiaoChenNeural">&#26313;&#33275; - &#20013;&#25991; (&#21488;&#28771;)</option>
+              <option value="zh-TW-YunJheNeural">&#38642;&#21746; - &#20013;&#25991; (&#21488;&#28771;)</option>
               <option value="ja-JP-NanamiNeural">Nanami - Japanese</option>
             </select>
           </div>
 
           <div class="field">
-            <label for="rateSelect">語速</label>
+            <label for="rateSelect">&#35486;&#36895;</label>
             <select id="rateSelect">
-              <option value="-30%">非常慢 (-30%)</option>
-              <option value="-20%">較慢 (-20%)</option>
-              <option value="-15%">慢 (-15%)</option>
-              <option value="-10%">稍慢 (-10%)</option>
-              <option value="-5%" selected>偏慢 (-5%)</option>
-              <option value="+0%">正常 (0%)</option>
-              <option value="+5%">稍快 (+5%)</option>
-              <option value="+10%">較快 (+10%)</option>
+              <option value="-30%">&#38750;&#24120;&#24930; (-30%)</option>
+              <option value="-20%">&#36611;&#24930; (-20%)</option>
+              <option value="-15%">&#24930; (-15%)</option>
+              <option value="-10%">&#31245;&#24930; (-10%)</option>
+              <option value="-5%" selected>&#20559;&#24930; (-5%)</option>
+              <option value="+0%">&#27491;&#24120; (0%)</option>
+              <option value="+5%">&#31245;&#24555; (+5%)</option>
+              <option value="+10%">&#36611;&#24555; (+10%)</option>
             </select>
           </div>
 
           <div class="field">
-            <label for="fileName">MP3 檔名</label>
+            <label for="fileName">MP3 &#27284;&#21517;</label>
             <input id="fileName" type="text" value="speech.mp3" autocomplete="off">
           </div>
 
           <div class="actions">
-            <button class="primary-button" id="generateButton" type="button">產生 MP3</button>
-            <button class="secondary-button" id="previewButton" type="button">朗讀預覽</button>
-            <button class="ghost-button" id="stopButton" type="button">停止朗讀</button>
+            <button class="primary-button" id="generateButton" type="button">&#29986;&#29983; MP3</button>
+            <button class="secondary-button" id="previewButton" type="button">&#35430;&#32893;&#35486;&#38899;</button>
+            <button class="ghost-button" id="stopButton" type="button">&#20572;&#27490;&#35430;&#32893;</button>
           </div>
 
           <div class="note">
-            <strong>說明</strong>
-            <p>MP3 產生會在瀏覽器端連線到 Microsoft Edge Read Aloud 服務，完成後直接下載，不經過自架伺服器。若瀏覽器封鎖此連線，可使用朗讀預覽。</p>
+            <strong>&#35498;&#26126;</strong>
+            <p>MP3 &#29986;&#29983;&#21644;&#35430;&#32893;&#26371;&#20778;&#20808;&#20351;&#29992; Microsoft Edge Read Aloud &#35486;&#38899;&#26381;&#21209;&#12290;&#33509;&#28687;&#35261;&#22120;&#28961;&#27861;&#36899;&#32218;&#65292;&#35430;&#32893;&#26371;&#25913;&#29992;&#28687;&#35261;&#22120;&#20839;&#24314;&#35486;&#38899;&#12290;</p>
           </div>
         </aside>
+      </section>
+
+      <section class="local-fallback" id="localFallback" hidden>
+        <div>
+          <p class="eyebrow">Local Version</p>
+          <h2>&#28961;&#27861;&#36899;&#21040; Edge TTS&#65311;</h2>
+          <p>Edge TTS &#22312;&#27492;&#28687;&#35261;&#22120;&#20013;&#29986;&#29983;&#22833;&#25943;&#12290;&#20320;&#21487;&#20197;&#19979;&#36617;&#26412;&#22320;&#31471;&#29256;&#26412;&#65292;&#20351;&#29992; Windows EXE &#36914;&#34892;&#36681;&#27284;&#12290;</p>
+        </div>
+        <a class="download-button" href="20260608_Text2MP3_v7.exe" download>&#19979;&#36617;&#26412;&#22320;&#31471;&#29256;&#26412; EXE</a>
       </section>
     </main>
 

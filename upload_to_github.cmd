@@ -36,6 +36,12 @@ if errorlevel 1 (
     git remote get-url origin
 )
 
+echo Setting local Git author...
+git config user.name "Turnstone7512"
+if errorlevel 1 goto :error
+git config user.email "Turnstone7512@gmail.com"
+if errorlevel 1 goto :error
+
 echo.
 echo Current changes:
 git status --short

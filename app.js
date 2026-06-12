@@ -12,14 +12,40 @@ const stopButton = document.querySelector("#stopButton");
 const clearTextButton = document.querySelector("#clearTextButton");
 const statusPill = document.querySelector("#statusPill");
 const charCount = document.querySelector("#charCount");
+const localFallback = document.querySelector("#localFallback");
 
 const state = {
   generating: false,
   browserVoices: [],
+  previewAudio: new Audio(),
+  previewUrl: "",
+  lastEdgeVoice: "en-US-EmmaNeural",
 };
 
 function setStatus(message) {
   statusPill.textContent = message;
+}
+
+function getSelectedEdgeVoice() {
+  return voiceSelect.value === "__browser__" ? state.lastEdgeVoice : voiceSelect.value;
+}
+
+function showLocalFallback() {
+  localFallback.hidden = false;
+}
+
+function showBrowserVoiceOption() {
+  const currentVoice = getSelectedEdgeVoice();
+  if (currentVoice !== "__browser__") state.lastEdgeVoice = currentVoice;
+
+  let option = voiceSelect.querySelector('option[value="__browser__"]');
+  if (!option) {
+    option = document.createElement("option");
+    option.value = "__browser__";
+    option.textContent = "\u700F\u89BD\u5668\u5167\u5EFA\u8A9E\u97F3";
+    voiceSelect.prepend(option);
+  }
+  voiceSelect.value = "__browser__";
 }
 
 function normalizeMp3Name(name) {
@@ -43,7 +69,7 @@ function saveSettings() {
   const payload = {
     text: textContent.value,
     rate: rateSelect.value,
-    voice: voiceSelect.value,
+    voice: getSelectedEdgeVoice(),
     fileName: fileName.value,
   };
   localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
@@ -105,6 +131,14 @@ function downloadBlob(blob, name) {
   link.click();
   link.remove();
   URL.revokeObjectURL(url);
+}
+
+function playPreviewBlob(blob) {
+  if (state.previewUrl) URL.revokeObjectURL(state.previewUrl);
+  state.previewUrl = URL.createObjectURL(blob);
+  state.previewAudio.src = state.previewUrl;
+  state.previewAudio.onended = () => setStatus("Ready");
+  return state.previewAudio.play();
 }
 
 function generateWithEdgeTts({ text, voice, rate }) {
@@ -190,48 +224,79 @@ function pickBrowserVoice(edgeVoice) {
     || null;
 }
 
-function previewSpeech() {
+function previewWithBrowserSpeech(text) {
+  if (!("speechSynthesis" in window)) {
+    throw new Error("Browser speech preview is not supported.");
+  }
+
+  state.previewAudio.pause();
+  state.previewAudio.currentTime = 0;
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(text);
+  const browserVoice = pickBrowserVoice(getSelectedEdgeVoice());
+  utterance.rate = browserRate(rateSelect.value);
+  if (browserVoice) utterance.voice = browserVoice;
+  utterance.onstart = () => setStatus("Browser preview...");
+  utterance.onend = () => setStatus("Ready");
+  utterance.onerror = () => setStatus("Browser preview failed");
+  window.speechSynthesis.speak(utterance);
+}
+
+async function previewSpeech() {
   const text = textContent.value.trim();
   if (!text) {
-    setStatus("請先輸入文字");
+    setStatus("Please enter text");
     return;
   }
 
-  window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(text);
-  const browserVoice = pickBrowserVoice(voiceSelect.value);
-  utterance.rate = browserRate(rateSelect.value);
-  if (browserVoice) utterance.voice = browserVoice;
-  utterance.onstart = () => setStatus("朗讀中...");
-  utterance.onend = () => setStatus("Ready");
-  utterance.onerror = () => setStatus("朗讀失敗");
-  window.speechSynthesis.speak(utterance);
+  previewButton.disabled = true;
+  setStatus("Generating Edge TTS preview...");
+
+  try {
+    const blob = await generateWithEdgeTts({
+      text,
+      voice: getSelectedEdgeVoice(),
+      rate: rateSelect.value,
+    });
+    setStatus("Playing Edge TTS preview...");
+    await playPreviewBlob(blob);
+  } catch (error) {
+    console.warn(error);
+    showLocalFallback();
+    showBrowserVoiceOption();
+    setStatus("Using browser fallback");
+    previewWithBrowserSpeech(text);
+  } finally {
+    previewButton.disabled = false;
+  }
 }
 
 async function handleGenerate() {
   const text = textContent.value.trim();
   if (!text) {
-    setStatus("請先輸入文字");
+    setStatus("Please enter text");
     alert("Please enter text.");
     return;
   }
 
   state.generating = true;
   generateButton.disabled = true;
-  setStatus("MP3 產生中...");
+  setStatus("Generating MP3...");
 
   try {
     const blob = await generateWithEdgeTts({
       text,
-      voice: voiceSelect.value,
+      voice: getSelectedEdgeVoice(),
       rate: rateSelect.value,
     });
     downloadBlob(blob, fileName.value);
-    setStatus("MP3 已下載");
+    setStatus("MP3 downloaded");
   } catch (error) {
     console.error(error);
-    setStatus("MP3 產生失敗");
-    alert(`MP3 generation failed.\n\n${error.message}\n\n你仍可使用「朗讀預覽」確認文字與語速。`);
+    showLocalFallback();
+    showBrowserVoiceOption();
+    setStatus("MP3 failed");
+    alert(`MP3 generation failed.\n\n${error.message}\n\nA local EXE download is now available below the web tool.`);
   } finally {
     state.generating = false;
     generateButton.disabled = false;
@@ -253,6 +318,8 @@ function bindEvents() {
   generateButton.addEventListener("click", handleGenerate);
   previewButton.addEventListener("click", previewSpeech);
   stopButton.addEventListener("click", () => {
+    state.previewAudio.pause();
+    state.previewAudio.currentTime = 0;
     window.speechSynthesis.cancel();
     setStatus("Ready");
   });
@@ -267,7 +334,6 @@ function bindEvents() {
     refreshBrowserVoices();
     window.speechSynthesis.onvoiceschanged = refreshBrowserVoices;
   } else {
-    previewButton.disabled = true;
     stopButton.disabled = true;
   }
 }
