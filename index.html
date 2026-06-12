@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Text2MP3</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">Static Browser App</p>
+          <h1>Text2MP3</h1>
+          <p class="subtitle">把文字轉成 MP3。資料只暫存在你的瀏覽器，不使用資料庫。</p>
+        </div>
+        <div class="status-pill" id="statusPill" aria-live="polite">Ready</div>
+      </section>
+
+      <section class="workspace" aria-label="文字轉語音工具">
+        <div class="editor-panel">
+          <label for="textContent">輸入文字</label>
+          <textarea id="textContent" placeholder="請輸入要轉成語音的文字..."></textarea>
+          <div class="meta-row">
+            <span id="charCount">0 characters</span>
+            <button class="ghost-button" id="clearTextButton" type="button">清除文字</button>
+          </div>
+        </div>
+
+        <aside class="settings-panel">
+          <div class="field">
+            <label for="voiceSelect">語音</label>
+            <select id="voiceSelect">
+              <option value="en-US-EmmaNeural">Emma - English (US)</option>
+              <option value="en-US-JennyNeural">Jenny - English (US)</option>
+              <option value="en-US-GuyNeural">Guy - English (US)</option>
+              <option value="zh-TW-HsiaoChenNeural">曉臻 - 中文 (台灣)</option>
+              <option value="zh-TW-YunJheNeural">雲哲 - 中文 (台灣)</option>
+              <option value="ja-JP-NanamiNeural">Nanami - Japanese</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="rateSelect">語速</label>
+            <select id="rateSelect">
+              <option value="-30%">非常慢 (-30%)</option>
+              <option value="-20%">較慢 (-20%)</option>
+              <option value="-15%">慢 (-15%)</option>
+              <option value="-10%">稍慢 (-10%)</option>
+              <option value="-5%" selected>偏慢 (-5%)</option>
+              <option value="+0%">正常 (0%)</option>
+              <option value="+5%">稍快 (+5%)</option>
+              <option value="+10%">較快 (+10%)</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="fileName">MP3 檔名</label>
+            <input id="fileName" type="text" value="speech.mp3" autocomplete="off">
+          </div>
+
+          <div class="actions">
+            <button class="primary-button" id="generateButton" type="button">產生 MP3</button>
+            <button class="secondary-button" id="previewButton" type="button">朗讀預覽</button>
+            <button class="ghost-button" id="stopButton" type="button">停止朗讀</button>
+          </div>
+
+          <div class="note">
+            <strong>說明</strong>
+            <p>MP3 產生會在瀏覽器端連線到 Microsoft Edge Read Aloud 服務，完成後直接下載，不經過自架伺服器。若瀏覽器封鎖此連線，可使用朗讀預覽。</p>
+          </div>
+        </aside>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
